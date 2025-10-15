@@ -1,8 +1,14 @@
 <?php
 
 use App\Http\Controllers\ComplaintController;
+use App\Http\Controllers\AdminController;
 
-Route::get('/klachten', [ComplaintController::class, 'index'])->name('complaints.index');
-Route::get('/klachten/nieuw', [ComplaintController::class, 'create'])->name('complaints.create');
-Route::post('/klachten', [ComplaintController::class, 'store'])->name('complaints.store');
-Route::get('/klachten/{complaint}', [ComplaintController::class, 'show'])->name('complaints.show');
+
+Route::get('/complaints/create', [ComplaintController::class, 'create'])->name('complaint.create');
+Route::post('/complaints', [ComplaintController::class, 'store'])->name('complaint.store');
+
+
+Route::middleware(['auth','is_admin'])->group(function () {
+    Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::patch('/admin/complaints/{complaint}/solve', [AdminController::class, 'solve'])->name('admin.complaints.solve');
+});

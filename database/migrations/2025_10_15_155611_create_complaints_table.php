@@ -13,13 +13,19 @@ return new class extends Migration
     {
         Schema::create('complaints', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email');
-            $table->string('subject');
+            $table->string('title');
             $table->text('description');
-            $table->enum('status', ['open', 'in_behandeling', 'opgelost'])->default('open');
+            $table->string('location_name');
+            $table->decimal('latitude', 10, 7);
+            $table->decimal('longitude', 10, 7);
+            $table->string('guest_name')->nullable();
+            $table->string('guest_email')->nullable();
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->boolean('solved')->default(false);
+            $table->string('ip_address')->nullable();
             $table->timestamps();
         });
+
     }
 
     /**

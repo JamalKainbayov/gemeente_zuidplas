@@ -3,39 +3,35 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Complaint;
 
 class ComplaintController extends Controller
 {
-    public function index()
-    {
-        $complaints = Complaint::latest()->get();
-        return view('complaints.index', compact('complaints'));
-    }
-
-    public function create()
-    {
+    public function create() {
         return view('complaints.create');
     }
 
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
         $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email',
-            'subject' => 'required|string|max:255',
-            'description' => 'required|string',
+            'title'=>'required',
+            'description'=>'required',
+            'latitude'=>'required|numeric',
+            'longitude'=>'required|numeric',
+            'guest_name'=>'nullable',
+            'guest_email'=>'nullable|email',
         ]);
 
-        Complaint::create($request->all());
+        Complaint::create([
+            'title'=>$request->title,
+            'description'=>$request->description,
+            'location_name'=>$request->location_name,
+            'latitude'=>$request->latitude,
+            'longitude'=>$request->longitude,
+            'guest_name'=>$request->guest_name,
+            'guest_email'=>$request->guest_email,
+            'ip_address'=>$request->ip(),
+        ]);
 
-        return redirect()->route('complaints.index')
-            ->with('success', 'Uw klacht is succesvol ingediend!');
+        return redirect()->back()->with('success','Klacht ingediend!');
     }
 
-    public function show(Complaint $complaint)
-    {
-        return view('complaints.show', compact('complaint'));
-    }
 }
-
