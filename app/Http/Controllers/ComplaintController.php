@@ -2,37 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Complaint;
+use Illuminate\Http\Request;
 
 class ComplaintController extends Controller
 {
-    public function create() {
+    public function create()
+    {
         return view('complaints.create');
     }
 
-    public function store(Request $request) {
-        $request->validate([
-            'title'=>'required',
-            'description'=>'required',
-            'latitude'=>'required|numeric',
-            'longitude'=>'required|numeric',
-            'guest_name'=>'nullable',
-            'guest_email'=>'nullable|email',
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'location_name' => 'required|string|max:255',
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+            'guest_name' => 'nullable|string|max:255',
+            'guest_email' => 'nullable|email|max:255',
         ]);
 
-        Complaint::create([
-            'title'=>$request->title,
-            'description'=>$request->description,
-            'location_name'=>$request->location_name,
-            'latitude'=>$request->latitude,
-            'longitude'=>$request->longitude,
-            'guest_name'=>$request->guest_name,
-            'guest_email'=>$request->guest_email,
-            'ip_address'=>$request->ip(),
-        ]);
+        $data['ip_address'] = $request->ip();
 
-        return redirect()->back()->with('success','Klacht ingediend!');
+        Complaint::create($data);
+
+        return redirect()->back()->with('success', 'Klacht ingediend!');
     }
-
 }
+

@@ -17,3 +17,4 @@ class Complaint extends Model
         'ip_address',
     ];
 }
+

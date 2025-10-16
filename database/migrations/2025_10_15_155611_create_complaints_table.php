@@ -20,13 +20,11 @@ return new class extends Migration
             $table->decimal('longitude', 10, 7);
             $table->string('guest_name')->nullable();
             $table->string('guest_email')->nullable();
-            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
-            $table->boolean('solved')->default(false);
-            $table->string('ip_address')->nullable();
+            $table->ipAddress('ip_address')->nullable();
             $table->timestamps();
         });
-
     }
+
 
     /**
      * Reverse the migrations.
