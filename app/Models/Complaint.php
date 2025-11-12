@@ -15,6 +15,6 @@ class Complaint extends Model
         'guest_name',
         'guest_email',
         'ip_address',
+        'status',
     ];
 }
-

@@ -2,13 +2,17 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\Authenticate;
+use App\Http\Middleware\IsAdmin;
+use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
 {
-    protected $routeMiddleware = [
-        'auth' => \App\Http\Middleware\Authenticate::class,
-        'is_admin' => \App\Http\Middleware\IsAdmin::class,
+    protected $middlewareAliases = [
+        'auth' => Authenticate::class,
+        'verified' => EnsureEmailIsVerified::class,
+        'is_admin' => IsAdmin::class,
     ];
 
 }

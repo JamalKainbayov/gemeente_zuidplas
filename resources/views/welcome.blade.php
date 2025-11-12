@@ -270,8 +270,9 @@
             </main>
         </div>
 
-        @if (Route::has('login'))
-            <div class="h-14.5 hidden lg:block"></div>
+        @if(session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
+
     </body>
 </html>
