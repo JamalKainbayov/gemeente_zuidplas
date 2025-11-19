@@ -2,102 +2,137 @@
 
 @section('content')
     <div class="container py-5">
+        <!-- breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Klacht Indienen</li>
+            </ol>
+        </nav>
+
         <div class="row justify-content-center">
             <div class="col-lg-10">
                 <div class="card shadow-lg border-0">
                     <div class="card-header bg-primary text-white py-4">
-                        <h2 class="mb-0"><i class="bi bi-megaphone-fill me-2"></i>Klacht Indienen</h2>
-                        <p class="mb-0 small opacity-75">Vul onderstaand formulier in om een klacht te melden in gemeente Zuidplas</p>
+                        <h2 class="mb-0"><i class="bi bi-pencil-square me-2" aria-hidden="true"></i>Melding indienen — Gemeente Zuidplas</h2>
+                        <p class="mb-0 small opacity-75">Gebruik dit formulier om een openbare klacht of melding bij de gemeente door te geven.</p>
                     </div>
                     <div class="card-body p-4">
-                        @if(session('success'))
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                        @endif
-
-                        <form action="{{ route('complaint.store') }}" method="POST" id="complaintForm">
-                            @csrf
-
-                            <div class="mb-4">
-                                <label for="title" class="form-label fw-semibold">Titel <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('title') is-invalid @enderror"
-                                       id="title" name="title" value="{{ old('title') }}"
-                                       placeholder="Korte omschrijving van de klacht" required>
-                                @error('title')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="mb-4">
-                                <label for="description" class="form-label fw-semibold">Beschrijving <span class="text-danger">*</span></label>
-                                <textarea class="form-control @error('description') is-invalid @enderror"
-                                          id="description" name="description" rows="5"
-                                          placeholder="Gedetailleerde beschrijving van de klacht" required>{{ old('description') }}</textarea>
-                                @error('description')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="mb-4">
-                                <label for="location_name" class="form-label fw-semibold">Locatie in Zuidplas <span class="text-danger">*</span></label>
-                                <div class="input-group mb-3">
-                                    <span class="input-group-text"><i class="bi bi-geo-alt-fill"></i></span>
-                                    <input type="text" class="form-control @error('location_name') is-invalid @enderror"
-                                           id="location_name" name="location_name" value="{{ old('location_name') }}"
-                                           placeholder="Klik op de kaart om een locatie te selecteren" required readonly>
-                                </div>
-                                @error('location_name')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-
-                                <div id="map" class="border rounded shadow-sm mb-2" style="height: 500px;"></div>
-                                <small class="text-muted d-block">
-                                    <i class="bi bi-info-circle"></i> Klik op de kaart binnen gemeente Zuidplas om de exacte locatie van de klacht te selecteren
-                                </small>
-                                <div id="location-error" class="alert alert-warning d-none mt-2">
-                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Let op: Selecteer alleen een locatie binnen gemeente Zuidplas
-                                </div>
-                            </div>
-
-                            <input type="hidden" name="latitude" id="latitude">
-                            <input type="hidden" name="longitude" id="longitude">
-
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-6">
-                                    <label for="guest_name" class="form-label fw-semibold">Naam</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
-                                        <input type="text" class="form-control @error('guest_name') is-invalid @enderror"
-                                               id="guest_name" name="guest_name" value="{{ old('guest_name') }}"
-                                               placeholder="Uw naam (optioneel)">
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                @if(session('success'))
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                        <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                                     </div>
-                                    @error('guest_name')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
+                                @endif
 
-                                <div class="col-md-6">
-                                    <label for="guest_email" class="form-label fw-semibold">Email</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
-                                        <input type="email" class="form-control @error('guest_email') is-invalid @enderror"
-                                               id="guest_email" name="guest_email" value="{{ old('guest_email') }}"
-                                               placeholder="uw@email.nl (optioneel)">
+                                <form action="{{ Route::has('complaint.store') ? route('complaint.store') : url('/complaints') }}" method="POST" id="complaintForm">
+                                    @csrf
+
+                                    <div class="mb-4">
+                                        <label for="title" class="form-label fw-semibold">Titel <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control @error('title') is-invalid @enderror"
+                                               id="title" name="title" value="{{ old('title') }}"
+                                               placeholder="Korte omschrijving van de klacht" required>
+                                        @error('title')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
-                                    @error('guest_email')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
+
+                                    <div class="mb-4">
+                                        <label for="description" class="form-label fw-semibold">Beschrijving <span class="text-danger">*</span></label>
+                                        <textarea class="form-control @error('description') is-invalid @enderror"
+                                                  id="description" name="description" rows="5"
+                                                  placeholder="Gedetailleerde beschrijving van de klacht" required>{{ old('description') }}</textarea>
+                                        @error('description')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label for="location_name" class="form-label fw-semibold">Locatie in Zuidplas <span class="text-danger">*</span></label>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text"><i class="bi bi-geo-alt-fill"></i></span>
+                                            <input type="text" class="form-control @error('location_name') is-invalid @enderror"
+                                                   id="location_name" name="location_name" value="{{ old('location_name') }}"
+                                                   placeholder="Klik op de kaart om een locatie te selecteren" required readonly>
+                                        </div>
+                                        @error('location_name')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+
+                                        <div id="map" class="border rounded shadow-sm mb-2" style="height: 500px;"></div>
+                                        <small class="text-muted d-block">
+                                            <i class="bi bi-info-circle"></i> Klik op de kaart binnen gemeente Zuidplas om de exacte locatie van de klacht te selecteren
+                                        </small>
+                                        <div id="location-error" class="alert alert-warning d-none mt-2">
+                                            <i class="bi bi-exclamation-triangle-fill me-2"></i>Let op: Selecteer alleen een locatie binnen gemeente Zuidplas
+                                        </div>
+                                    </div>
+
+                                    <input type="hidden" name="latitude" id="latitude">
+                                    <input type="hidden" name="longitude" id="longitude">
+
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-6">
+                                            <label for="guest_name" class="form-label fw-semibold">Naam</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                                                <input type="text" class="form-control @error('guest_name') is-invalid @enderror"
+                                                       id="guest_name" name="guest_name" value="{{ old('guest_name') }}"
+                                                       placeholder="Uw naam (optioneel)">
+                                            </div>
+                                            @error('guest_name')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label for="guest_email" class="form-label fw-semibold">Email</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+                                                <input type="email" class="form-control @error('guest_email') is-invalid @enderror"
+                                                       id="guest_email" name="guest_email" value="{{ old('guest_email') }}"
+                                                       placeholder="uw@email.nl (optioneel)">
+                                            </div>
+                                            @error('guest_email')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" disabled aria-label="Verstuur melding">
+                                            <i class="bi bi-send-fill me-2" aria-hidden="true"></i>Verstuur melding
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-0 shadow-sm mb-3">
+                                    <div class="card-body">
+                                        <h6 class="fw-semibold mb-2">Hulp nodig?</h6>
+                                        <p class="small mb-2">Bel 14 0182 (lokaal tarief) of stuur een e-mail naar <a href="mailto:gemeente@zuidplas.nl">gemeente@zuidplas.nl</a>.</p>
+                                        <p class="small mb-0"><strong>Openingstijden:</strong><br>Ma–Vr 09:00–16:00</p>
+                                    </div>
+                                </div>
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body small">
+                                        <strong>Privacy</strong>
+                                        <p class="mb-0">Uw gegevens worden gebruikt om deze melding te behandelen. Lees onze <a href="#">privacyverklaring</a>.</p>
+                                    </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" disabled>
-                                    <i class="bi bi-send-fill me-2"></i>Klacht Indienen
-                                </button>
-                            </div>
-                        </form>
+                        <div id="map" class="border rounded shadow-sm mb-2" style="height: 500px;"></div>
+                        <small class="text-muted d-block">
+                            <i class="bi bi-info-circle"></i> Klik op de kaart binnen gemeente Zuidplas om de exacte locatie van de klacht te selecteren
+                        </small>
+                        <div id="location-error" class="alert alert-warning d-none mt-2">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>Let op: Selecteer alleen een locatie binnen gemeente Zuidplas
+                        </div>
                     </div>
                 </div>
             </div>
@@ -108,6 +143,17 @@
 @push('styles')
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
+        .breadcrumb {
+            background: transparent;
+            padding-left: 0;
+            padding-right: 0;
+            margin-bottom: 0.75rem;
+            --bs-breadcrumb-divider: "›";
+        }
+        .card-header.bg-primary {
+            background: linear-gradient(90deg, #0d6efd 0%, #0b5ed7 100%);
+        }
+
         /* Kaart container styling */
         #map {
             height: 500px;

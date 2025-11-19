@@ -5,9 +5,9 @@
         <div class="row mb-4">
             <div class="col">
                 <h1 class="display-5 fw-bold text-primary mb-2">
-                    <i class="bi bi-speedometer2 me-2"></i>Admin Dashboard
+                    <i class="bi bi-building me-2" aria-hidden="true"></i>Dashboard — Gemeente Zuidplas
                 </h1>
-                <p class="text-muted mb-0">Beheer alle ingediende klachten voor gemeente Zuidplas</p>
+                <p class="text-muted mb-0">Overzicht en beheer van meldingen en klachten — uitsluitend voor bevoegde medewerkers</p>
             </div>
             <div class="col-auto">
                 <div class="badge bg-primary fs-6 px-3 py-2">
@@ -17,12 +17,50 @@
             </div>
         </div>
 
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert alert-info mb-3 shadow-sm" role="note">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            Handelingen (verwijderen / markeren als opgelost) worden gelogd. Gebruik met verantwoordelijkheidszin.
+        </div>
+
+        <div class="row mb-3 g-3 align-items-center">
+            <div class="col-md-8">
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <div class="card shadow-sm metric-card">
+                            <div class="card-body d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="bi bi-hourglass-split fs-3 text-warning"></i>
+                                </div>
+                                <div>
+                                    <div class="text-muted small">In behandeling</div>
+                                    <div class="fs-4 fw-bold">{{ $complaints->where('status', '!=', 'resolved')->count() }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="card shadow-sm metric-card">
+                            <div class="card-body d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="bi bi-check-circle-fill fs-3 text-success"></i>
+                                </div>
+                                <div>
+                                    <div class="text-muted small">Opgelost</div>
+                                    <div class="fs-4 fw-bold">{{ $complaints->where('status', 'resolved')->count() }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        @endif
+
+            <div class="col-md-4 text-md-end">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                    <input id="complaintSearch" type="text" class="form-control" placeholder="Zoeken op titel, locatie of indiener">
+                </div>
+            </div>
+        </div>
 
         <div class="card shadow-lg border-0">
             <div class="card-header bg-gradient text-white py-3">
@@ -110,24 +148,29 @@
                                             <button type="submit"
                                                     class="btn btn-sm btn-success"
                                                     @if($complaint->status === 'resolved') disabled @endif
-                                                    title="Markeer als opgelost">
-                                                <i class="bi bi-check-lg"></i>
+                                                    title="Markeer als opgelost"
+                                                    aria-label="Markeer klacht #{{ $complaint->id }} als opgelost">
+                                                <i class="bi bi-check-lg" aria-hidden="true"></i>
                                             </button>
                                         </form>
-                                        <button type="button"
-                                                class="btn btn-sm btn-info text-white"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#mapModal{{ $complaint->id }}"
-                                                title="Bekijk op kaart">
+
+                                        <!-- replaced modal button with direct Google Maps link -->
+                                        <a href="https://www.google.com/maps?q={{ $complaint->latitude }},{{ $complaint->longitude }}"
+                                           target="_blank"
+                                           class="btn btn-sm btn-info text-white"
+                                           title="Open in Google Maps"
+                                           aria-label="Open locatie van klacht #{{ $complaint->id }} in Google Maps (nieuw tabblad)">
                                             <i class="bi bi-map"></i>
-                                        </button>
+                                        </a>
+
                                         <form action="{{ route('admin.complaint.destroy', $complaint) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"
                                                     class="btn btn-sm btn-danger"
                                                     onclick="return confirm('Weet je zeker dat je deze klacht wilt verwijderen?')"
-                                                    title="Verwijderen">
+                                                    title="Verwijderen"
+                                                    aria-label="Verwijder klacht #{{ $complaint->id }}">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
@@ -135,30 +178,7 @@
                                 </td>
                             </tr>
 
-                            <!-- Map Modal -->
-                            <div class="modal fade" id="mapModal{{ $complaint->id }}" tabindex="-1">
-                                <div class="modal-dialog modal-lg modal-dialog-centered">
-                                    <div class="modal-content">
-                                        <div class="modal-header bg-primary text-white">
-                                            <h5 class="modal-title">
-                                                <i class="bi bi-map me-2"></i>Locatie: {{ $complaint->location_name }}
-                                            </h5>
-                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                        </div>
-                                        <div class="modal-body p-0">
-                                            <div id="adminMap{{ $complaint->id }}" style="height: 400px;"></div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <a href="https://www.google.com/maps?q={{ $complaint->latitude }},{{ $complaint->longitude }}"
-                                               target="_blank"
-                                               class="btn btn-primary">
-                                                <i class="bi bi-box-arrow-up-right me-2"></i>Open in Google Maps
-                                            </a>
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sluiten</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <!-- removed Map Modal for admin to avoid loading maps -->
                         @empty
                             <tr>
                                 <td colspan="9" class="text-center py-5">
@@ -179,7 +199,6 @@
 @endsection
 
 @push('styles')
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         .bg-gradient {
             background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%);
@@ -291,11 +310,6 @@
             padding: 1rem 1.5rem;
         }
 
-        [id^="adminMap"] {
-            border-radius: 0;
-            height: 450px !important;
-        }
-
         .text-truncate {
             display: inline-block;
             max-width: 200px;
@@ -318,6 +332,14 @@
             font-family: 'Courier New', monospace;
             font-size: 0.85rem;
             line-height: 1.6;
+        }
+
+        /* slight spacing for metric cards on dashboard */
+        .metric-card .card-body { padding: 1rem; }
+        /* improve table small-screen readability */
+        @media (max-width: 768px) {
+            .text-truncate { max-width: 120px; }
+            .card-body { padding: 0.5rem; }
         }
 
         @keyframes fadeIn {
@@ -347,10 +369,6 @@
             .table-responsive {
                 overflow-x: auto;
             }
-
-            [id^="adminMap"] {
-                height: 350px !important;
-            }
         }
 
         @media (max-width: 768px) {
@@ -367,34 +385,24 @@
                 padding: 0.375rem 0.5rem;
                 font-size: 0.875rem;
             }
-
-            [id^="adminMap"] {
-                height: 300px !important;
-            }
         }
     </style>
 @endpush
 
 @push('scripts')
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            @foreach($complaints as $complaint)
-            const modal{{ $complaint->id }} = document.getElementById('mapModal{{ $complaint->id }}');
-            if (modal{{ $complaint->id }}) {
-                modal{{ $complaint->id }}.addEventListener('shown.bs.modal', function () {
-                    const mapDiv = document.getElementById('adminMap{{ $complaint->id }}');
-                    if (!mapDiv._leaflet_id) {
-                        const map = L.map('adminMap{{ $complaint->id }}').setView([{{ $complaint->latitude }}, {{ $complaint->longitude }}], 15);
-                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                            attribution: '© OpenStreetMap contributors'
-                        }).addTo(map);
-                        L.marker([{{ $complaint->latitude }}, {{ $complaint->longitude }}]).addTo(map)
-                            .bindPopup('<strong>{{ $complaint->location_name }}</strong>').openPopup();
-                    }
+        // small client-side filter for the complaints table (kept)
+        document.addEventListener('DOMContentLoaded', function () {
+            const input = document.getElementById('complaintSearch');
+            if (!input) return;
+            input.addEventListener('input', function () {
+                const q = input.value.trim().toLowerCase();
+                const rows = document.querySelectorAll('tbody tr.complaint-row');
+                rows.forEach(row => {
+                    const text = row.innerText.toLowerCase();
+                    row.style.display = q === '' || text.includes(q) ? '' : 'none';
                 });
-            }
-            @endforeach
+            });
         });
     </script>
 @endpush
